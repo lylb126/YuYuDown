@@ -27,6 +27,7 @@ namespace YuYuDown
         /// 单例模式
         /// </summary>
         private DownFm _downFm;
+
         public Form1()
         {
             InitializeComponent();
@@ -34,13 +35,13 @@ namespace YuYuDown
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            if (!Directory.Exists(System.IO.Directory.GetCurrentDirectory() + "/down"))
-            {
-                System.IO.Directory.CreateDirectory(System.IO.Directory.GetCurrentDirectory() + "/down");
-            }
-            LogHelper.WriteLog("项目启动啦");
             _downFm = DownFm.GetInstance();
             _downFm.Form = this;
+            if (!Directory.Exists( _downFm.Downstr))
+            {
+                System.IO.Directory.CreateDirectory(_downFm.Downstr);
+            }
+            LogHelper.WriteLog($"项目启动啦,时间:{DateTime.Now}");
         }
         /// <summary>
         /// 开始全部下载
@@ -53,7 +54,7 @@ namespace YuYuDown
             {
                 if (Idtext.Text.Equals(""))
                 {
-                    MessageBox.Show("煜煜，请输入要下载的ID", ErrorCode.Caption);
+                    MessageBox.Show(ErrorCode.IdNullMsg, ErrorCode.Caption);
                 }
 
                 this.AllDwBt.Enabled = false;
@@ -62,8 +63,10 @@ namespace YuYuDown
             }
             catch (Exception exception)
             {
-                LogHelper.ErrorLog("下载出错啦",exception);
-                MessageBox.Show("煜煜，报错了联系老刘吧", ErrorCode.Caption);
+                LogHelper.ErrorLog(
+                    ErrorCode.ErrorMsg + nameof(AllDown)
+                    , exception);
+                MessageBox.Show(ErrorCode.ErrorMsg, ErrorCode.Caption);
                 this.AllDwBt.Enabled = true;
             }
 
@@ -81,7 +84,7 @@ namespace YuYuDown
             if (result == null)
             {
                 AllDwBt.Enabled = false;
-                MessageBox.Show("煜煜，没有找到这个动漫", ErrorCode.Caption);
+                MessageBox.Show(ErrorCode.SelectNull, ErrorCode.Caption);
                 return;
             }
 
@@ -107,7 +110,7 @@ namespace YuYuDown
                 cm.play();
             }
             //还可以进行其他的一些完任务完成之后的逻辑处理
-            MessageBox.Show("任务完成", ErrorCode.Caption);
+            MessageBox.Show(ErrorCode.DownSuccess, ErrorCode.Caption);
         }
         /// <summary>
         ///  获取项目根目录
@@ -138,16 +141,19 @@ namespace YuYuDown
         {
             Accomplish();
         }
-
+        /// <summary>
+        ///  打开本地下载目录
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenDown_Click(object sender, EventArgs e)
         {
-            string OpenFolderPath = Environment.CurrentDirectory.ToString()+"\\down";
-            if (!Directory.Exists(OpenFolderPath))
+            if (!Directory.Exists(_downFm.Downstr))
             {
-                MessageBox.Show("这个目录还没有被创建！你直接开始下载就好了", ErrorCode.Caption);
+                MessageBox.Show(ErrorCode.FolderPathNull, ErrorCode.Caption);
                 return;
             }
-            System.Diagnostics.Process.Start("explorer.exe", OpenFolderPath);
+            System.Diagnostics.Process.Start("explorer.exe", _downFm.Downstr);
         }
     }
 }

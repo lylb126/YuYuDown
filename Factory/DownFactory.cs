@@ -11,7 +11,10 @@ namespace YuYuDown.Factory
     /// </summary>
    public abstract class DownFactory
     {
-        public  ContainerControl form;
+        /// <summary>
+        /// 查询
+        /// </summary>
+        public abstract T Select<T>(string id);
         /// <summary>
         /// 下载
         /// </summary>

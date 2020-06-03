@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CCWin.SkinControl;
@@ -18,7 +19,7 @@ namespace YuYuDown.Common
     /// 保证单例模式
     /// sealed不可继承
     /// </summary>
-    public sealed  class DownFm: DownFactory
+    public sealed  class DownFm
     {
         /// <summary>
         /// 定义一个静态变量来保存类的实例
@@ -83,6 +84,8 @@ namespace YuYuDown.Common
         ///  获取图片前缀
         /// </summary>
         string ImagesAdress;
+
+        public string Downstr;
         #endregion
         /// <summary>
         /// 定义私有构造函数，使外界不能创建该类实例
@@ -97,6 +100,7 @@ namespace YuYuDown.Common
             Getsound = GetConfig("getsound");
             Getimages = GetConfig("getimages");
             ImagesAdress = GetConfig("imagesaddress");
+            Downstr =Directory.GetCurrentDirectory() + "/"+GetConfig("SaveAddress");
         }
 
         /// <summary>
@@ -133,7 +137,7 @@ namespace YuYuDown.Common
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Root Select(string id)
+        public  Root Select(string id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
             try
@@ -148,7 +152,7 @@ namespace YuYuDown.Common
             }
             catch (Exception e)
             {
-                LogHelper.ErrorLog("查询出错啦", e);
+                LogHelper.ErrorLog(ErrorCode.SelectError, e);
                 return null;
             }
         }
@@ -170,14 +174,14 @@ namespace YuYuDown.Common
             }
             catch (Exception e)
             {
-                LogHelper.ErrorLog("下载出错啦", e);
+                LogHelper.ErrorLog(ErrorCode.DownError, e);
                 UpdataForm(() =>
                 {
-                    NowDown.Text = @"煜煜,下载出错啦";
+                    NowDown.Text = ErrorCode.DownError;
                 });
                 return;
             }
-            //下载结束
+            //下载结束，进行通知
             UpdataForm(() =>
             {
                 Form.Accomplish();
@@ -193,7 +197,7 @@ namespace YuYuDown.Common
                 if (result.success)
                 {
                     var filename = resultRoot.info.drama.name.Replace('/', ' ');
-                    var directorypath = Environment.CurrentDirectory + "/down/" + filename + "/" + episode.name;
+                    var directorypath = Downstr+ filename + "/" + episode.name;
                     if (!Directory.Exists(directorypath))
                     {
                         Directory.CreateDirectory(directorypath);
@@ -275,8 +279,8 @@ namespace YuYuDown.Common
             }
             catch (Exception e)
             {
-                LogHelper.ErrorLog($@"下载出错啦！！！执行DownloadImageFile时", e);
-                MessageBox.Show(@"煜煜，下载出错啦。找老刘吧", ErrorCode.Caption);
+                LogHelper.ErrorLog(ErrorCode.DownImgError, e);
+                MessageBox.Show(ErrorCode.DownImgError, ErrorCode.Caption);
 
             }
             finally
@@ -297,7 +301,7 @@ namespace YuYuDown.Common
             try
             {
                 System.Net.HttpWebRequest myrq = (System.Net.HttpWebRequest) System.Net.WebRequest.Create(url);
-                myrq.Timeout= 300000;//等待五分钟
+                myrq.Timeout= 180000;//等待三分钟
                 System.Net.HttpWebResponse myrp = (System.Net.HttpWebResponse) myrq.GetResponse();
                 long totalBytes = myrp.ContentLength;
                 UpdataForm(()=>
@@ -327,7 +331,7 @@ namespace YuYuDown.Common
             catch (Exception e)
             {
                 LogHelper.ErrorLog("下载出错啦", e);
-                MessageBox.Show(@"煜煜，下载出错啦。找老刘吧", ErrorCode.Caption);
+                MessageBox.Show(ErrorCode.DownActionError, ErrorCode.Caption);
                
             }
             finally
@@ -335,26 +339,6 @@ namespace YuYuDown.Common
                 so.Close();
                 st?.Close();
             }
-        }
-
-        public override void Down()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Start()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void End()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Notice()
-        {
-            throw new NotImplementedException();
         }
     }
 }
