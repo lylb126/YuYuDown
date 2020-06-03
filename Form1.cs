@@ -44,7 +44,6 @@ namespace YuYuDown
                 {
                     MessageBox.Show(ErrorCode.IdNullMsg, ErrorCode.Caption);
                 }
-
                 this.AllDwBt.Enabled = false;
                 var t1 = new Task(() => _downFm.Start(Idtext.Text));
                 t1.Start();
@@ -99,6 +98,7 @@ namespace YuYuDown
                 cm.FileName = GetApplicationPath() + "/Music/dingdong.mp3";
                 cm.play();
             }
+            AllDwBt.Enabled = true;
             //还可以进行其他的一些完任务完成之后的逻辑处理
             MessageBox.Show(ErrorCode.DownSuccess, ErrorCode.Caption);
         }
@@ -116,7 +116,7 @@ namespace YuYuDown
             //    folderName = path.Substring(path.LastIndexOf("\\") + 1);
             //}
             //return path.Substring(0, path.LastIndexOf("\\") + 1);
-            return Environment.CurrentDirectory.ToString();
+            return Environment.CurrentDirectory;
         }
 
         private void Idtext_KeyDown(object sender, KeyEventArgs e)

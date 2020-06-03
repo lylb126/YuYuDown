@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -36,7 +37,12 @@ namespace YuYuDown.Common
         /// 配置文件
         /// </summary>
         private static readonly AppSettingsSection Config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings;
+        /// <summary>
+        /// 现在正在下载的任务列表
+        /// </summary>
+        public  Dictionary<DownloadedTask, bool> NowDownTask=new Dictionary<DownloadedTask, bool>();
 
+        public static volatile DownloadedTask NowDowmFmModel;
         #region 窗体以及控件信息
         /// <summary>
         ///  更新的窗体
@@ -163,12 +169,22 @@ namespace YuYuDown.Common
         /// <param name="id">FM Id</param>
         public  void Start(string id)
         {
+            Root result = null;
             try
             {
                 //获取FM当前小说下所有的话ID
-                Root result = Select(id);
+                result = Select(id);
                 if (result.success)
                 {
+                    NowDowmFmModel = new DownloadedTask
+                    {
+                        DownTime = DateTime.Now,
+                        DramaId = id,
+                        DramaName = result.info.drama.name,
+                        SaveAddress = Downstr + result.info.drama.name.Replace('/', ' ')
+                    };
+                    NowDownTask.Add(NowDowmFmModel, true);
+                    
                     GetMp3(result);
                 }
             }
@@ -181,11 +197,15 @@ namespace YuYuDown.Common
                 });
                 return;
             }
+
             //下载结束，进行通知
             UpdataForm(() =>
             {
+             
                 Form.Accomplish();
             });
+            NowDownTask.Remove(NowDowmFmModel);
+            NowDowmFmModel = null;
         }
         public  void GetMp3(Root resultRoot)
         {
