@@ -1,23 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Data;
-using System.Drawing;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YuYuDown.Model.GetDrama;
-using YuYuDown.Model.Getsound;
 using CCWin;
 using YuYuDown.Common;
-using System.Media;
-using System.Runtime.InteropServices;
-
 namespace YuYuDown
 {
     public partial class Form1 : Skin_Mac
@@ -100,7 +88,9 @@ namespace YuYuDown
         }
 
 
-        //完成任务时需要调用
+        /// <summary>
+        ///  完成任务时调用
+        /// </summary>
         public void Accomplish()
         {
             if (DwMusicCk.Checked)

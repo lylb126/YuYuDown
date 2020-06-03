@@ -148,7 +148,9 @@
     <Content Include="image\defute.jpg" />
     <Content Include="image\FormIco.ico" />
     <Content Include="image\loading.gif" />
-    <Content Include="Music\dingdong.mp3" />
+    <EmbeddedResource Include="Music\dingdong.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
