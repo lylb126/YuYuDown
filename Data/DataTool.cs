@@ -18,24 +18,24 @@ namespace YuYuDown.Data
         /// <summary>
         /// 下载数据的保存地址
         /// </summary>
-        private static string _jsonAddress =ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings
+        private static string _fmPath =ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).AppSettings
             .Settings["_fmPath"].Value;
         /// <summary>
         /// 读取JSON数据
         /// </summary>
         /// <returns>返回List集合数据</returns>
-        public static T ReadData<T>()
+        public static T ReadData<T>() where T : new()
         {
             ;
             //如果路径上有文件，就读取文件
-            if (File.Exists(_jsonAddress))
+            if (File.Exists(_fmPath))
             {
                 //读取数据
                 BinaryFormatter bf = new BinaryFormatter();
-                using (FileStream file = File.Open(dataPath + _jsonAddress, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (FileStream file = File.Open(dataPath + _fmPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
 
-                    return file.Length > 0 ? (T)bf.Deserialize(file) : default(T);
+                    return file.Length > 0 ? (T)bf.Deserialize(file) : new T();//default (T) 引用类型和值类型返回值不一样，default(T)引用类型为空，容易报错
                 }
             }
             //如果没有文件，创建一个新的
@@ -45,13 +45,13 @@ namespace YuYuDown.Data
                 {
                     Directory.CreateDirectory(dataPath);
                 }
-                using (FileStream fs = new FileStream(dataPath+_jsonAddress, FileMode.CreateNew))
+                using (FileStream fs = new FileStream(dataPath+_fmPath, FileMode.CreateNew))
                 {
                     StreamWriter sw = new StreamWriter(fs);
                     sw.Write(String.Empty);  //这里是写入的内容             
                     sw.Flush();
                 }
-                return default(T);
+                return new T();
             }
         }
         /// <summary>
@@ -62,11 +62,11 @@ namespace YuYuDown.Data
         {
             //保存数据      
             BinaryFormatter bf = new BinaryFormatter();
-            if (File.Exists(dataPath + _jsonAddress))
+            if (File.Exists(dataPath + _fmPath))
             {
-                File.Delete(dataPath + _jsonAddress);
+                File.Delete(dataPath + _fmPath);
             }
-            using (FileStream file = File.Create(dataPath + _jsonAddress))
+            using (FileStream file = File.Create(dataPath + _fmPath))
             {
                 bf.Serialize(file, Dwdata);
             }
