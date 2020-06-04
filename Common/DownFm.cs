@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CCWin.SkinControl;
 using Newtonsoft.Json;
+using YuYuDown.Data;
 using YuYuDown.Factory;
 using YuYuDown.Model;
 using YuYuDown.Model.GetDrama;
 using YuYuDown.Model.Getsound;
+using YuYuDown.StructCode;
 
 namespace YuYuDown.Common
 {
@@ -169,11 +171,11 @@ namespace YuYuDown.Common
         /// <param name="id">FM Id</param>
         public  void Start(string id)
         {
-            Root result = null;
+            
             try
             {
                 //获取FM当前小说下所有的话ID
-                result = Select(id);
+                Root result = Select(id);
                 if (result.success)
                 {
                     NowDowmFmModel = new DownloadedTask
@@ -181,10 +183,10 @@ namespace YuYuDown.Common
                         DownTime = DateTime.Now,
                         DramaId = id,
                         DramaName = result.info.drama.name,
-                        SaveAddress = Downstr + result.info.drama.name.Replace('/', ' ')
+                        SaveAddress = Downstr + result.info.drama.name.Replace('/', ' '),
+                        DwStatus = DwCode.DwReady
                     };
                     NowDownTask.Add(NowDowmFmModel, true);
-                    
                     GetMp3(result);
                 }
             }
@@ -197,14 +199,16 @@ namespace YuYuDown.Common
                 });
                 return;
             }
-
             //下载结束，进行通知
             UpdataForm(() =>
             {
              
                 Form.Accomplish();
             });
+           
+            NowDowmFmModel.DwStatus = DwCode.Success;
             NowDownTask.Remove(NowDowmFmModel);
+            JsonData.Dwdata.Add(NowDowmFmModel);
             NowDowmFmModel = null;
         }
         public  void GetMp3(Root resultRoot)
@@ -229,7 +233,7 @@ namespace YuYuDown.Common
                     var t1 = new Task(() => GetImages(directorypath + "/Images", episode));
                     t1.Start();
                     DownloadFile(result.info.sound.soundurl, directorypath + "/" + episode.name + ".MP3"); //下载文件
-                    Task.WaitAll(t1);//等待所有任务结束   
+                    Task.WaitAll(t1);//等待本轮任务结束   
                 }
             }
 

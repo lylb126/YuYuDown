@@ -31,5 +31,9 @@ namespace YuYuDown.Model
         /// 漫画实体
         /// </summary>
         public Root FmModel { get; set; }
+        /// <summary>
+        ///  下载状态   DwCode
+        /// </summary>
+        public string  DwStatus { get; set; }
     }
 }

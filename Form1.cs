@@ -23,13 +23,16 @@ namespace YuYuDown
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            LogHelper.WriteLog($"项目启动啦,时间:{DateTime.Now}");
+            //检查网络状态
+            if (!CheckNetWork.CheckServeStatus())
+                MessageBox.Show(ErrorCode.NetWorkError, ErrorCode.Caption);
             _downFm = DownFm.GetInstance();
             _downFm.Form = this;
             if (!Directory.Exists( _downFm.Downstr))
             {
                 System.IO.Directory.CreateDirectory(_downFm.Downstr);
             }
-            LogHelper.WriteLog($"项目启动啦,时间:{DateTime.Now}");
         }
         /// <summary>
         /// 开始全部下载

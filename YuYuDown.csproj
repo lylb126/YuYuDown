@@ -92,10 +92,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\CheckNetWork.cs" />
     <Compile Include="Common\clsMCI.cs" />
     <Compile Include="Common\LogHelper.cs" />
     <Compile Include="Common\DownFm.cs" />
-    <Compile Include="ErrorCode.cs" />
+    <Compile Include="Data\JsonData.cs" />
+    <Compile Include="StructCode\DwCode.cs" />
+    <Compile Include="StructCode\ErrorCode.cs" />
     <Compile Include="Factory\DownFactory.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
