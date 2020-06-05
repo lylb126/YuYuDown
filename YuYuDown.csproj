@@ -97,6 +97,7 @@
     <Compile Include="Common\LogHelper.cs" />
     <Compile Include="Common\DownFm.cs" />
     <Compile Include="Data\DataTool.cs" />
+    <Compile Include="Data\JsonTool.cs" />
     <Compile Include="StructCode\DwCode.cs" />
     <Compile Include="StructCode\ErrorCode.cs" />
     <Compile Include="Factory\DownFactory.cs" />
