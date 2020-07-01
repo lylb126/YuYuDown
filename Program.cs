@@ -16,7 +16,6 @@ namespace YuYuDown
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            JsonData.ReadJsonData();
             Application.Run(new Form1());
         }
     }
