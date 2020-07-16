@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\CheckNetWork.cs" />
+    <Compile Include="Common\CloneExtends.cs" />
     <Compile Include="Common\clsMCI.cs" />
     <Compile Include="Common\LogHelper.cs" />
     <Compile Include="Common\DownFm.cs" />
