@@ -35,7 +35,7 @@ namespace YuYuDown.Common
                 {
 
                     LogHelper.WriteLog("网络不稳定");
-                    return false;
+                    return true;
                 }
             }
             else

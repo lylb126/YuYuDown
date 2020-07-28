@@ -60,7 +60,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -97,9 +97,9 @@
     <Compile Include="Common\clsMCI.cs" />
     <Compile Include="Common\LogHelper.cs" />
     <Compile Include="Common\DownFm.cs" />
-    <Compile Include="Common\MsgBox.cs" />
     <Compile Include="Data\DataTool.cs" />
     <Compile Include="Data\JsonTool.cs" />
+    <Compile Include="MQ\MessageSend.cs" />
     <Compile Include="StructCode\DwCode.cs" />
     <Compile Include="StructCode\ErrorCode.cs" />
     <Compile Include="Factory\DownFactory.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="Common\PostTool.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SystemModel\SytemVersion.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -129,7 +130,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Log4Net.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

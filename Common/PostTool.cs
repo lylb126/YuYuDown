@@ -16,29 +16,34 @@ namespace YuYuDown
         /// <param name="url">请求后台地址</param>
         /// <param name="dic">参数键值对形式</param>
         /// <returns></returns>
-        public static string Post(string url, Dictionary<string, string> dic)
+        public static string Get(string url, Dictionary<string, string> dic=null)
         {
             string result = "";
             HttpWebRequest req = (HttpWebRequest)WebRequest.Create(url);
-            req.Method = "POST";
+            req.Method = "GET";
             req.ContentType = "application/x-www-form-urlencoded";
             #region 添加Post 参数
-            StringBuilder builder = new StringBuilder();
-            int i = 0;
-            foreach (var item in dic)
+          
+            if (dic != null)
             {
-                if (i > 0)
-                    builder.Append("&");
-                builder.AppendFormat("{0}={1}", item.Key, item.Value);
-                i++;
+                StringBuilder builder = new StringBuilder();
+                bool  firstAppend=false;
+                foreach (var item in dic)
+                {
+                    if (firstAppend)
+                        builder.Append("&");
+                    builder.AppendFormat("{0}={1}", item.Key, item.Value);
+                    firstAppend=true;
+                }
+                byte[] data = Encoding.UTF8.GetBytes(builder.ToString());
+                req.ContentLength = data.Length;
+                using (Stream reqStream = req.GetRequestStream())
+                {
+                    reqStream.Write(data, 0, data.Length);
+                    reqStream.Close();
+                }
             }
-            byte[] data = Encoding.UTF8.GetBytes(builder.ToString());
-            req.ContentLength = data.Length;
-            using (Stream reqStream = req.GetRequestStream())
-            {
-                reqStream.Write(data, 0, data.Length);
-                reqStream.Close();
-            }
+           
             #endregion
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
             Stream stream = resp.GetResponseStream();

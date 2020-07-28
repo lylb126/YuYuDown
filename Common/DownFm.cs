@@ -13,6 +13,7 @@ using YuYuDown.Factory;
 using YuYuDown.Model;
 using YuYuDown.Model.GetDrama;
 using YuYuDown.Model.Getsound;
+using YuYuDown.MQ;
 using YuYuDown.StructCode;
 
 namespace YuYuDown.Common
@@ -45,36 +46,7 @@ namespace YuYuDown.Common
         public  Dictionary<DownloadedTask, bool> nowDownTask=new Dictionary<DownloadedTask, bool>();
 
         public static volatile DownloadedTask nowDowmFmModel;
-        #region 窗体以及控件信息
-        /// <summary>
-        ///  更新的窗体
-        /// </summary>
-        public Form1 Form;
-        /// <summary>
-        ///  当前FM下载                 
-        /// </summary>
-        private SkinTextBox NowDown;
-
-        /// <summary>
-        ///  当前图片下载
-        /// </summary>
-        private SkinTextBox _imgDown;
-
-        /// <summary>
-        ///  图片进度条
-        /// </summary>
-        private SkinProgressBar _imgDwBar;
-
-        /// <summary>
-        ///  当前话进度条
-        /// </summary>
-        private SkinProgressBar DwprogressBar;
-        /// <summary>
-        ///  更新指定Form窗体
-        /// </summary>
-        /// <param name="action">无参数传入</param>
-        private void UpdataForm(Action action) => Form.Invoke(action);
-        #endregion
+        public static MessageSend messageSend => MessageSend.messageSend;
         #region 地址信息
         /// <summary>
         ///  获取获得FM作品地址
@@ -100,10 +72,6 @@ namespace YuYuDown.Common
         /// </summary>
         private DownFm()
         {
-            NowDown = Form.Controls.Find("nowDown", true).First() as SkinTextBox;
-            _imgDown = Form.Controls.Find("ImgDown", true).First() as SkinTextBox;
-            _imgDwBar = Form.Controls.Find("ImgDwBar", true).First() as SkinProgressBar;
-            DwprogressBar = Form.Controls.Find("DwprogressBar", true).First() as SkinProgressBar;
             Getdrama = GetConfig("getdrama");
             Getsound = GetConfig("getsound");
             Getimages = GetConfig("getimages");
@@ -193,19 +161,14 @@ namespace YuYuDown.Common
             catch (Exception e)
             {
                 LogHelper.ErrorLog(ErrorCode.DownError, e);
-                UpdataForm(() =>
+                messageSend.RegisterAction("Up_down_error", new Dictionary<string, string>
                 {
-                    NowDown.Text = ErrorCode.DownError;
+                    { "error", ErrorCode.DownError}
                 });
                 return;
             }
             //下载结束，进行通知
-            UpdataForm(() =>
-            {
-             
-                Form.Accomplish();
-            });
-           
+            messageSend.RegisterAction("Accomplish", null);
             nowDowmFmModel.DwStatus = DwCode.Success;
             nowDownTask.Remove(nowDowmFmModel);
             JsonTool.SaveData(nowDowmFmModel);
@@ -226,9 +189,10 @@ namespace YuYuDown.Common
                     {
                         Directory.CreateDirectory(directorypath);
                     }
-                    UpdataForm(() =>
+                    //发送开始下载信息
+                    messageSend.RegisterAction("Up_down_name",new Dictionary<string, string>
                     {
-                        NowDown.Text = episode.name;
+                        { "name", episode.name}
                     });
                     var t1 = new Task(() => GetImages(directorypath + "/Images", episode));
                     t1.Start();
@@ -260,13 +224,14 @@ namespace YuYuDown.Common
                     }
 
                     DownloadImageFile(ImagesAdress + item.First(), saveAddress + "/" + filename); //下载文件
-                    UpdataForm(() =>
+                    //发送开始下载信息
+                    messageSend.RegisterAction("Up_down_all", new Dictionary<string, string>
                     {
-                        _imgDwBar.Maximum = result.successVal.images.Count;
-                        _imgDwBar.Value = current;
-                        _imgDown.Text = $@"{episode.name} {_imgDwBar.Maximum}/{current}";
-                        current++;
+                        { "imgDwBar_Maximum", result.successVal.images.Count.ToString()},
+                        { "imgDwBar_Value", current.ToString()},
+                        { "imgDown", $@"{episode.name} {result.successVal.images.Count}/{current}"}
                     });
+                    current++;
                 }
             }
         }
@@ -328,9 +293,9 @@ namespace YuYuDown.Common
                 myrq.Timeout= 180000;//等待三分钟
                 System.Net.HttpWebResponse myrp = (System.Net.HttpWebResponse) myrq.GetResponse();
                 long totalBytes = myrp.ContentLength;
-                UpdataForm(()=>
+                messageSend.RegisterAction("Up_down_mp3_Maximum", new Dictionary<string, string>
                 {
-                    DwprogressBar.Maximum = (int) totalBytes;
+                    { "Maximum",totalBytes.ToString()}
                 });
                 st = myrp.GetResponseStream();
                 long totalDownloadedByte = 0;
@@ -344,9 +309,9 @@ namespace YuYuDown.Common
                         Application.DoEvents();
                         so.Write(by, 0, size);
                         var downloadedByte = totalDownloadedByte;
-                        UpdataForm(()=>
+                        messageSend.RegisterAction("Up_down_mp3", new Dictionary<string, string>
                         {
-                            DwprogressBar.Value =(int)downloadedByte;
+                            { "DwprogressBar_Value", downloadedByte.ToString()}
                         });
                         size = st.Read(by, 0,  by.Length);
                     }
@@ -356,7 +321,7 @@ namespace YuYuDown.Common
             {
                 LogHelper.ErrorLog("下载出错啦", e);
                 MessageBox.Show(ErrorCode.DownActionError, ErrorCode.Caption);
-               
+                
             }
             finally
             {

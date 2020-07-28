@@ -6,10 +6,13 @@ using System.Windows.Forms;
 using YuYuDown.Model.GetDrama;
 using CCWin;
 using YuYuDown.Common;
+using YuYuDown.MQ;
+
 namespace YuYuDown
 {
     public partial class Form1 : Skin_Mac
     {
+        private MessageSend messageSend => MessageSend.messageSend;
         /// <summary>
         /// 下载器
         /// 单例模式
@@ -24,11 +27,7 @@ namespace YuYuDown
         private void Form1_Load(object sender, EventArgs e)
         {
             LogHelper.WriteLog($"项目启动啦,时间:{DateTime.Now}");
-            //检查网络状态
-            if (!CheckNetWork.CheckServeStatus())
-                MessageBox.Show(ErrorCode.NetWorkError, ErrorCode.Caption);
-            _downFm = DownFm.GetInstance();
-            _downFm.Form = this;
+            _downFm = DownFm.GetInstance(this);
             if (!Directory.Exists( _downFm.Downstr))
             {
                 System.IO.Directory.CreateDirectory(_downFm.Downstr);
@@ -51,11 +50,11 @@ namespace YuYuDown
                 var t1 = new Task(() => _downFm.Start(Idtext.Text));
                 t1.Start();
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
                 LogHelper.ErrorLog(
                     ErrorCode.ErrorMsg + nameof(AllDown)
-                    , exception);
+                    , ex);
                 MessageBox.Show(ErrorCode.ErrorMsg, ErrorCode.Caption);
                 this.AllDwBt.Enabled = true;
             }
@@ -68,8 +67,7 @@ namespace YuYuDown
         /// <param name="e"></param>
         private void Select(object sender, EventArgs e)
         {
-
-              //获取FM当前小说下所有的话ID
+            //获取FM当前小说下所有的话ID
             Root result = _downFm.Select(Idtext.Text.Trim());
             if (result == null)
             {
@@ -77,7 +75,6 @@ namespace YuYuDown
                 MessageBox.Show(ErrorCode.SelectNull, ErrorCode.Caption);
                 return;
             }
-
             AllDwBt.Enabled = true;
             ShowView.Items.Clear();
             ShowView.Items.AddRange(result.info.episodes.episode.OrderBy(s => s.id).Select(s => new ListViewItem() { ImageIndex = 1, Text = s.name, ToolTipText = s.soundstr })
@@ -129,11 +126,6 @@ namespace YuYuDown
                 this.Select(sender, e);
             }
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Accomplish();
-        }
         /// <summary>
         ///  打开本地下载目录
         /// </summary>
@@ -147,6 +139,44 @@ namespace YuYuDown
                 return;
             }
             System.Diagnostics.Process.Start("explorer.exe", _downFm.Downstr);
+        }
+        /// <summary>
+        /// 订阅事件
+        /// </summary>
+        private void subscribeEvent()
+        {
+            //下载结束
+            messageSend.SubscribeExecute("Accomplish", (datavalue) =>
+            {
+                Accomplish();
+            });
+            //更新下载小说名称
+            messageSend.SubscribeExecute("Up_down_name", (datavalue) =>
+            {
+                nowDown.Text = datavalue["name"];
+            });
+            //更新总下载量
+            messageSend.SubscribeExecute("Up_down_all", (datavalue) =>
+            {
+                ImgDwBar.Maximum = int.Parse(datavalue["imgDwBar_Maximum"]);
+                ImgDwBar.Value = int.Parse(datavalue["imgDwBar_Value"]);
+                ImgDown.Text = datavalue["name"];
+            }); 
+            //更新MP3下载
+            messageSend.SubscribeExecute("Up_down_mp3", (datavalue) =>
+            {
+                DwprogressBar.Value = int.Parse(datavalue["DwprogressBar_Value"]);
+            });
+            //更新MP3下载总大小
+            messageSend.SubscribeExecute("Up_down_mp3_Maximum", (datavalue) =>
+            {
+                DwprogressBar.Maximum = int.Parse(datavalue["DwprogressBar_Value"]);
+            });
+            //下载错误
+            messageSend.SubscribeExecute("Up_down_error", (datavalue) =>
+            {
+                nowDown.Text = datavalue["error"];
+            });
         }
     }
 }
