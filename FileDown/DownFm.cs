@@ -76,7 +76,7 @@ namespace YuYuDown.Common
             Getsound = GetConfig("getsound");
             Getimages = GetConfig("getimages");
             ImagesAdress = GetConfig("imagesaddress");
-            Downstr =Directory.GetCurrentDirectory() + "/"+GetConfig("SaveAddress");
+            Downstr =Directory.GetCurrentDirectory() + "/"+GetConfig("SaveDown");
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace YuYuDown.Common
             try
             {
                 //获取FM当前小说下所有的话ID
-                Root result = JsonConvert.DeserializeObject<Root>(PostTool.Post(Getdrama + id.Trim()));
+                Root result = JsonConvert.DeserializeObject<Root>(PostTool.Get(Getdrama + id.Trim()));
                 if (result.success)
                 {
                     return result;
@@ -139,7 +139,6 @@ namespace YuYuDown.Common
         /// <param name="id">FM Id</param>
         public  void Start(string id)
         {
-            
             try
             {
                 //获取FM当前小说下所有的话ID
@@ -180,7 +179,7 @@ namespace YuYuDown.Common
             {
                 //获取FM当前小说下所有的话ID
                 RootGetdound result =
-                    JsonConvert.DeserializeObject<RootGetdound>(PostTool.Post(Getsound + episode.sound_id));
+                    JsonConvert.DeserializeObject<RootGetdound>(PostTool.Get(Getsound + episode.sound_id));
                 if (result.success)
                 {
                     var filename = resultRoot.info.drama.name.Replace('/', ' ');
@@ -210,7 +209,7 @@ namespace YuYuDown.Common
                 Directory.CreateDirectory(saveAddress);
             }
             //获取FM当前小说的当前会话的所有图片
-            RootImage result =JsonConvert.DeserializeObject<RootImage>(PostTool.Post(Getimages + episode.sound_id));
+            RootImage result =JsonConvert.DeserializeObject<RootImage>(PostTool.Get(Getimages + episode.sound_id));
             if (result.success.Equals(ErrorCode.Success))
             {
                 int current = 1;

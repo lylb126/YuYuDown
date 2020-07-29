@@ -42,7 +42,7 @@ namespace YuYuDown.MQ
         public void SubscribeExecute(string executeName, Action<Dictionary<string, string>> action)
         {
             registerEvent.Add(executeName, action);
-            if (registerEvent.ContainsKey(executeName))
+            if (dataValue.ContainsKey(executeName))
             {
                 registerEvent[executeName](dataValue[executeName]);//回调
             }

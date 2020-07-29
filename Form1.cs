@@ -26,8 +26,10 @@ namespace YuYuDown
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //订阅消息
+            subscribeEvent();
             LogHelper.WriteLog($"项目启动啦,时间:{DateTime.Now}");
-            _downFm = DownFm.GetInstance(this);
+            _downFm = DownFm.GetInstance();
             if (!Directory.Exists( _downFm.Downstr))
             {
                 System.IO.Directory.CreateDirectory(_downFm.Downstr);
