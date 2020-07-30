@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using YuYuDown.Model.GetDrama;
 using CCWin;
 using YuYuDown.Common;
+using YuYuDown.FileDown;
 using YuYuDown.MQ;
 
 namespace YuYuDown
@@ -70,7 +71,7 @@ namespace YuYuDown
         private void Select(object sender, EventArgs e)
         {
             //获取FM当前小说下所有的话ID
-            Root result = _downFm.Select(Idtext.Text.Trim());
+            Root result = _downFm.Select(Idtext.Text.Trim()) as Root;
             if (result == null)
             {
                 AllDwBt.Enabled = false;

@@ -10,6 +10,7 @@ using CCWin.SkinControl;
 using Newtonsoft.Json;
 using YuYuDown.Data;
 using YuYuDown.Factory;
+using YuYuDown.FileDown;
 using YuYuDown.Model;
 using YuYuDown.Model.GetDrama;
 using YuYuDown.Model.Getsound;
@@ -23,7 +24,7 @@ namespace YuYuDown.Common
     /// 保证单例模式
     /// sealed不可继承
     /// </summary>
-    public sealed  class DownFm
+    public sealed  class DownFm: IDown
     {
         /// <summary>
         /// 定义一个静态变量来保存类的实例
@@ -113,7 +114,7 @@ namespace YuYuDown.Common
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public  Root Select(string id)
+        public object Select(string id)
         {
             if (id == null) throw new ArgumentNullException(nameof(id));
             try
@@ -142,7 +143,7 @@ namespace YuYuDown.Common
             try
             {
                 //获取FM当前小说下所有的话ID
-                Root result = Select(id);
+                Root result = Select(id) as Root;
                 if (result.success)
                 {
                     nowDowmFmModel = new DownloadedTask
@@ -166,6 +167,12 @@ namespace YuYuDown.Common
                 });
                 return;
             }
+            //下載结束
+            End();
+        }
+
+        public void End()
+        {
             //下载结束，进行通知
             messageSend.RegisterAction("Accomplish", null);
             nowDowmFmModel.DwStatus = DwCode.Success;

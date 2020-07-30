@@ -99,6 +99,7 @@
     <Compile Include="FileDown\DownFm.cs" />
     <Compile Include="Data\DataTool.cs" />
     <Compile Include="Data\JsonTool.cs" />
+    <Compile Include="FileDown\IDown.cs" />
     <Compile Include="MQ\MessageSend.cs" />
     <Compile Include="StructCode\DwCode.cs" />
     <Compile Include="StructCode\ErrorCode.cs" />
