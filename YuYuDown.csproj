@@ -100,6 +100,8 @@
     <Compile Include="Data\DataTool.cs" />
     <Compile Include="Data\JsonTool.cs" />
     <Compile Include="FileDown\IDown.cs" />
+    <Compile Include="InitTool.cs" />
+    <Compile Include="MQ\FuncModel.cs" />
     <Compile Include="MQ\MessageSend.cs" />
     <Compile Include="StructCode\DwCode.cs" />
     <Compile Include="StructCode\ErrorCode.cs" />

@@ -11,12 +11,8 @@ namespace YuYuDown.MQ
         /// <summary>
         /// 事件注册
         /// </summary>
-        private static Dictionary<string, Action<Dictionary<string, string>>> registerEvent = new Dictionary<string, Action<Dictionary<string, string>>>();
+        private static Dictionary<string,List<FuncModel>> registerEvent = new Dictionary<string, List<FuncModel>>();
         /// <summary>
-        ///  数据
-        /// </summary>
-        private static Dictionary<string, Dictionary<string, string>> dataValue=new Dictionary<string, Dictionary<string, string>>();
-       /// <summary>
        ///   定义一个标识确保线程同步
        /// </summary>
        private static readonly object Locker = new object();
@@ -35,41 +31,37 @@ namespace YuYuDown.MQ
             }
         }
         /// <summary>
-        /// 订阅事件
+        /// 订阅消息
         /// </summary>
         /// <param name="executeName">事件名称</param>
         /// <param name="action">执行动作</param>
-        public void SubscribeExecute(string executeName, Action<Dictionary<string, string>> action)
+        public void SubscribeExecute(string executeName, Action<Dictionary<string,string>> action)
         {
-            registerEvent.Add(executeName, action);
-            if (dataValue.ContainsKey(executeName))
+            FuncModel funcModel=new FuncModel()
             {
-                registerEvent[executeName](dataValue[executeName]);//回调
+                func = action,FuncName = executeName
+            };
+            if (registerEvent.ContainsKey(executeName))
+            {
+                registerEvent[executeName].Add(funcModel);
             }
+            else registerEvent.Add(executeName,new List<FuncModel>(){ funcModel });
         }
 
         /// <summary>
-        /// 注册事件信息
+        ///  发布消息
         /// </summary>
         /// <param name="executeName">事件名称</param>
         /// <param name="value">数据</param>
-        public void RegisterAction(string executeName, Dictionary<string, string> value)
+        public bool RegisterAction(string executeName, Dictionary<string, string> value)
         {
-            if (!string.IsNullOrEmpty(executeName) && value != null)
+            registerEvent.TryGetValue(executeName, out List<FuncModel> func);
+            if (func==null||func?.Count <= 0) return false;
+            foreach (var itemFuncModel in func)
             {
-                if (dataValue.ContainsKey(executeName))
-                {
-                    dataValue[executeName] = value;
-                }
-                else
-                {
-                    dataValue.Add(executeName, value);
-                }
+                itemFuncModel.func(value);
             }
-            if (!string.IsNullOrEmpty(executeName) &&registerEvent.ContainsKey(executeName))
-            {
-                registerEvent[executeName](dataValue[executeName]);//回调
-            }
+            return true;
         }
 
     }

@@ -111,17 +111,13 @@ namespace YuYuDown
         /// <returns></returns>
         private static string GetApplicationPath()
         {
-            //string path = Environment.CurrentDirectory.ToString();
-            //string folderName = String.Empty;
-            //while (folderName.ToLower() != "bin")
-            //{
-            //    path = path.Substring(0, path.LastIndexOf("\\"));
-            //    folderName = path.Substring(path.LastIndexOf("\\") + 1);
-            //}
-            //return path.Substring(0, path.LastIndexOf("\\") + 1);
             return Environment.CurrentDirectory;
         }
-
+        /// <summary>
+        /// 查询
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Idtext_KeyDown(object sender, KeyEventArgs e)
         {
             if(e.KeyCode==Keys.Enter)
